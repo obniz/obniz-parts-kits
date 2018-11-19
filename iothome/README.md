@@ -68,3 +68,11 @@ obniz.onconnect = async function () {
   }
 }
 ```
+
+## install
+
+```html
+<script src="https://unpkg.com/obniz@latest/obniz.js"></script>
+<script src="https://unpkg.com/obniz-parts-kits@latest/iothome/index.js"></script>
+```
+
