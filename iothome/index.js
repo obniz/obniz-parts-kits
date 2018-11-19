@@ -28,6 +28,7 @@ class IoTHomeKit {
     this.proximity = this._proximityNameFromDistance(this._lastProximityChangeDistancde);
     
     /* ir */
+    this._irCallbacks = [];
     this._irDetected = [];
     this.onirdetect = undefined;
   }
@@ -68,6 +69,10 @@ class IoTHomeKit {
     this.irmodule.start()
 
     this.irmodule.ondetect = (arr) => {
+      for (let i=0; i<this._irCallbacks.length; i++) {
+        this._irCallbacks[i](arr);
+      }
+      this._irCallbacks = [];
       this._irDetected.push(arr);
       if (typeof this.onirdetect === "function") {
         this.onirdetect(distance);
@@ -114,6 +119,12 @@ class IoTHomeKit {
   getOneIrRecord() {
     if (!this.hasIrRecord()) return undefined;
     return this._irDetected.splice(0,1);
+  }
+  
+  getIrWait() {
+    return new Promise((resolve, reject)=>{
+      this._irCallbacks.push(resolve);
+    })
   }
   
   irSend(arr) {

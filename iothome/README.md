@@ -59,12 +59,10 @@ obniz.onconnect = async function () {
   
   // sync method to get ir
   while(true) {
-    var arr = homekit.getOneIrRecord();
-    if (arr) {
-      irSignal = arr;
-      console.log("ir:"+arr.length);
-    }
-    await obniz.wait(1);
+    // var arr = homekit.getOneIrRecord(); // retriving latest one
+    var arr = await iot.getIrWait(); // async method
+    irSignal = arr;
+    console.log("ir:"+arr.length);
   }
 }
 ```
