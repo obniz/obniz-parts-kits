@@ -131,18 +131,6 @@ class IoTHomeKit {
     this.irmodule.send(arr);
   }
   
-  /* API related */
-  
-  async getWeather(region) {
-    
-    /* https://developer.yahoo.com/weather/documentation.html#codes */
-    const res = await fetch("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22"+region+"%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys")
-    const data = await res.json();
-    
-    const forecast = data.query.results.channel.item.forecast[0].text;
-    return forecast;
-  }
-  
   async _createStorage() {
     this._storageCache = {};
     let form = new FormData();

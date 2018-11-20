@@ -194,20 +194,6 @@ class AIRobotKit {
     }
     return 'unknown';
   }
-  
-  /* speech */
-  
-  say(message, rate, pitch) {
-    const synth = window.speechSynthesis;
-    let message = new SpeechSynthesisUtterance(message);
-    if(typeof rate === "number") {
-      message.rate = rate;
-    }
-    if(typeof pitch === "number") {
-      message.pitch = pitch;
-    }
-    synth.speak(message);
-  }
 
   
   /* distance */
