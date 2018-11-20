@@ -4,66 +4,23 @@
 
 ```javascript
 obniz.onconnect = async function () {
-
-  var homekit = obniz.wired("IoTHomeKit");
-
-  /* servo */
-  homekit.flag("up");
-  await obniz.wait(1000);
-  homekit.flag("down");
-
-  /* distance sensor */
-
-  // distance async
-  homekit.ondistancechange = (distance) => {
-    //console.log(distance);
-  }
   
-  // proximity from distance
-  homekit.onproximitychange = (p) => {
-    console.log(p + ":" + homekit.distance);
-    if (p === "near") {
-      homekit.flag("up");
-    } else {
-      homekit.flag("down");
-    }
-  }
+  var robot = obniz.wired("AIRobotKit");
   
-  // distance sync methods
-  var mm = homekit.getDistance();
-  var oneOfThreeType = homekit.getProximity();
+  //robot.move("forward"); or "back"
+  //robot.turn("right"); or "left"
   
-  /* API */
-
-  // API getting weather
-  var weatherinfo = await homekit.getWeather('Tokyo');
-  console.log(weatherinfo)
-
-  /* Storage */
-  await homekit.saveToStorage('something_key', 'something_value');
-  var data = await homekit.loadFromStorage('something_key');
-  console.log(data);
-
-  /* IR */
-
-  var irSignal;
-
-  $("#send").click(()=>{
-    if (irSignal)
-      homekit.irSend(irSignal);
-  })
-
-  // async method to be notified ir detection
-  // homekit.onirdetect = function(arr){
-  //}
-  
-  // sync method to get ir
+  await robot.startCamWait();
   while(true) {
-    var arr = homekit.getOneIrRecord();
-    if (arr) {
-      irSignal = arr;
-      console.log("ir:"+arr.length);
-    }
+    // face detection
+    console.log(robot.isFaceInside());
+    
+    // classify
+    console.log(await robot.classify());
+    
+    // white line detection
+    console.log(robot.positionOfWhiteline());
+    
     await obniz.wait(1);
   }
 }

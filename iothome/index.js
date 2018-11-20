@@ -5,7 +5,7 @@ class IoTHomeKit {
     this.requiredKeys = [];
     
     this._storageCache;
-    this.cloudStorageFileName = 'iothomekit_storage';
+    this.cloudStorageFileName = 'iothomekit_storage.json';
     
     /* distance */
     this.ondistancechange = undefined;
