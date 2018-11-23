@@ -89,6 +89,7 @@ class ObnizAIHelper {
   /* tensorflow */
   
   async classify() {
+    // http://starpentagon.net/analytics/imagenet_ilsvrc2012_dataset/
     const predictions = await this._mobileNet.classify(this.video);
     for (let i=0; i<predictions.length; i++) {
       const name = predictions[i].className;

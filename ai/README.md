@@ -29,7 +29,10 @@ while(true) {
 ## install
 
 ```html
-<script src="https://unpkg.com/obniz@latest/obniz.js"></script>
+<script src="https://unpkg.com/obniz-parts-kits@0.1.4/airobot/opencv3.4/opencv.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.5"> </script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.2.2"> </script>
+
 <script src="https://unpkg.com/obniz-parts-kits@latest/ai/index.js"></script>
 ```
 
