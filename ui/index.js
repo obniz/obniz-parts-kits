@@ -1,6 +1,6 @@
 var obniz_button_counter = 0;
 
-class ObnizUI {
+class ObnizButton {
   constructor(text, size) {
     this.size = (size || "M").toUpperCase();
     this.no = obniz_button_counter;
@@ -63,8 +63,16 @@ class ObnizUI {
     return this.pushed;
   }
 
+}
 
+var ObnizUtil  = {
+  wait : function(ms){
+    return new Promise(resolve => setTimeout(() => resolve(x), ms));
+  }
 }
 
 
-
+var ObnizUI = {
+  Button : ObnizButton,
+  Util : ObnizUtil,
+}
