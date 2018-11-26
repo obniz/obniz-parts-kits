@@ -67,7 +67,7 @@ class ObnizButton {
 
 var ObnizUtil  = {
   wait : function(ms){
-    return new Promise(resolve => setTimeout(() => resolve(x), ms));
+    return new Promise(resolve => setTimeout(() => resolve(), ms));
   }
 }
 
