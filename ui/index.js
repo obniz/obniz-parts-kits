@@ -34,6 +34,9 @@ class ObnizButton {
     $("#obniz_button_"+this.no).on('touchend mouseup',()=>{
       this.touchEnd();
     })
+    $(document).on('touchend mouseup',()=>{
+      this.touchEnd();
+    })
     $("#obniz_button_"+this.no).on('click',()=>{
       this.click();
     })

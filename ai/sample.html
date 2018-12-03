@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sample</title>
+  <script src="opencv3.4/opencv.js"></script>
+  <script src="index.js"></script>
+  <script src="../ui/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.5"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.2.2"> </script>
+</head>
+<body>
+
+<div id="OBNIZ_OUTPUT"></div>
+
+<script>
+  (async function(){
+    await _ai.startCamWait();
+
+    while(1){
+
+      if (_ai.isFaceInside()) {
+        _ai.say("あり")
+      }else{
+        _ai.say("なし")
+      }
+      await ObnizUtil.wait(1000);
+    }
+  })();
+
+</script>
+
+</body>
+</html>

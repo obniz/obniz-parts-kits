@@ -18,8 +18,11 @@ class ObnizAIHelper {
   }
   
   _prepareDOM() {
-    const viodeDOM = `<video id="video_forairobotkit" width="320px" height="240px" autoplay playsinline></video>`;
-    document.body.innerHTML = viodeDOM + document.body.innerHTML;
+    var div = document.createElement('div');
+    div.innerHTML = `<video id="video_forairobotkit" width="320px" height="240px" autoplay playsinline></video>`;
+    const viodeDOM = div.firstChild;
+    var output = document.getElementById("OBNIZ_OUTPUT");
+    output.appendChild(viodeDOM);
     this.video = document.getElementById("video_forairobotkit");
   }
   

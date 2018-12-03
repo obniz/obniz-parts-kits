@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sample</title>
+  <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
+  <script src="index.js"></script>
+
+</head>
+<body>
+
+<div id="OBNIZ_OUTPUT"></div>
+
+<script>
+  (async function(){
+    var button = new ObnizButton("hello");
+
+    while(1){
+      if(button.isClicked()){
+        console.log("clicked");
+      }
+      if(button.isTouching()){
+        console.log("touching");
+
+      }
+      await ObnizUtil.wait(1000);
+    }
+  })();
+
+</script>
+
+</body>
+</html>
