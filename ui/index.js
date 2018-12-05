@@ -24,7 +24,8 @@ class ObnizButton {
     var output = document.getElementById("OBNIZ_OUTPUT");
     var button = document.createElement("button");
     button.id = 'obniz_button_'+this.no;
-    button.style = "width:"+this.width[this.size]+";height:100px;font-size:50px;";
+    button.style = "width:"+this.width[this.size]+";height:100px;font-size:30px;";
+    button.className="btn btn-primary";
     button.innerText = this.text;
     output.appendChild(button);
     $("#obniz_button_"+this.no).on('touchstart mousedown', ()=>{
