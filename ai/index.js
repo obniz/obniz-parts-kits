@@ -73,7 +73,6 @@ class ObnizAIHelper {
 
   _detectFace() {
     const video = this.video;
-    console.log(this.video.currentTime);
     if (this.closestFace.time !== this.video.currentTime) {
       this.closestFace.time = this.video.currentTime;
 
@@ -155,15 +154,23 @@ class ObnizAIHelper {
   /* speech */
   
   say(mes, rate, pitch) {
-    const synth = window.speechSynthesis;
-    let message = new SpeechSynthesisUtterance(mes);
-    if(typeof rate === "number") {
-      message.rate = rate;
-    }
-    if(typeof pitch === "number") {
-      message.pitch = pitch;
-    }
-    synth.speak(message);
+    return new Promise((resolve, reject) => {
+      const synth = window.speechSynthesis;
+      let message = new SpeechSynthesisUtterance(mes);
+      if(typeof rate === "number") {
+        message.rate = rate;
+      }
+      if(typeof pitch === "number") {
+        message.pitch = pitch;
+      }
+      message.onend = () => {
+        resolve();
+      }
+      message.onerror = (err) => {
+        reject(err);
+      }
+      synth.speak(message);
+    })
   }
 
   /* API related */
