@@ -15,16 +15,31 @@
 
 <script>
   (async function(){
+
+    // weather forecast
+    const weather = await _ai.getWeather('Tokyo');
+    console.log(weather);
+
+    // say
+    await _ai.say(weather);
+
+    // Vision
     await _ai.startCamWait();
-
-    while(1){
-
+    
+    while(true) {
+      // face detection
       if (_ai.isFaceInside()) {
-        _ai.say("あり")
-      }else{
-        _ai.say("なし")
+        console.log('face x: ' + _ai.positionOfFace()); // -1 to 1. notfound = 0
+        console.log('face d: ' + _ai.distanceOfFace()); // 0 to 100. notfound = 0
       }
-      await ObnizUtil.wait(1000);
+      
+      // classify
+      console.log(await _ai.classify());
+      
+      // white line detection
+      console.log(_ai.positionOfWhiteline());
+      
+      await new Promise((resolve)=>{setTimeout(resolve, 1)})
     }
   })();
 
