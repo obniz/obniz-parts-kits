@@ -45,8 +45,8 @@ class IoTHomeKit {
     /* assign parts */
     
     this.irmodule = obniz.wired('IRModule',   { vcc: 0, send: 1, recv: 2, gnd: 3 });
-    this.servo =    obniz.wired("ServoMotor", { gnd:6, vcc:7, signal:8});
-    this.distanceSensor = obniz.wired("GP2Y0A21YK0F", {vcc:9, gnd:10, signal:11});
+    this.distanceSensor = obniz.wired("GP2Y0A21YK0F", { gnd:8,vcc:7, signal:6});
+    this.servo =    obniz.wired("ServoMotor", { gnd:9, vcc:10, signal:11});
     
     /* initial configrations */
     
