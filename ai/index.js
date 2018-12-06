@@ -5,6 +5,19 @@ class ObnizAIHelper {
     /* tfjs */
     this.tfModel = undefined;
     this.video = undefined;
+
+    this.tfclassify = {
+      time: null,
+      name: 'unknown'
+    }
+
+    this.closestFace = {
+      time: null,
+      found: false,
+      x:0,
+      y:0,
+      distance: 0
+    }
   }
 
   
@@ -28,7 +41,7 @@ class ObnizAIHelper {
   
   async _loadCascadeModel() {
     const path = 'haarcascade_frontalface_default.xml';
-    const url = 'https://unpkg.com/obniz-parts-kits@0.1.2/airobot/opencv3.4/haarcascade_frontalface_default.xml'
+    const url = 'https://unpkg.com/obniz-parts-kits@0.2.0/ai/opencv3.4/haarcascade_frontalface_default.xml'
     const response = await fetch(url);
     const buf = await response.arrayBuffer();
     cv.FS_createDataFile('/', path, new Uint8Array(buf), true, false, false);
@@ -57,32 +70,65 @@ class ObnizAIHelper {
   }
   
   /* opencv */
+
+  _detectFace() {
+    const video = this.video;
+    console.log(this.video.currentTime);
+    if (this.closestFace.time !== this.video.currentTime) {
+      this.closestFace.time = this.video.currentTime;
+
+      const cap = this.cap;
+      let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+      let gray = new cv.Mat();
+      let faces = new cv.RectVector();
+      
+      cap.read(src);
+      
+      // detect faces.
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+      let msize = new cv.Size(0, 0);
+      this._cv_classifier.detectMultiScale(gray, faces, 1.1, 3, 0, msize, msize);
+  
+      this.closestFace.found = false;
+      this.closestFace.distance = 100;
+      for (let i = 0; i < faces.size(); ++i) {
+        let face = faces.get(i);
+        const distance = (video.width - face.width) / video.width * 100;
+        if (distance < this.closestFace.distance) {
+          this.closestFace.found = true;
+          this.closestFace.x = ((face.x + face.width/2)/video.width)*2 - 1;
+          this.closestFace.y = ((face.y + face.height/2)/video.height)*2 - 1;
+          this.closestFace.distance = distance;
+        }
+      }
+
+      src.delete();
+      gray.delete();
+      faces.delete();
+    }
+  }
   
   isFaceInside() {
-    const video = this.video;
-    const cap = this.cap;
-    let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
-    let gray = new cv.Mat();
-    let faces = new cv.RectVector();
-    
-    cap.read(src);
-    
-    // detect faces.
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-    let msize = new cv.Size(0, 0);
-    this._cv_classifier.detectMultiScale(gray, faces, 1.1, 3, 0, msize, msize);
+    this._detectFace();
+    return this.closestFace.found;
+  }
 
-    const faceCount = faces.size();
-    src.delete();
-    gray.delete();
-    faces.delete();
-    return faceCount !== 0;
-    //for (let i = 0; i < faces.size(); ++i) {
-    //  let face = faces.get(i);
-    //  let point1 = new cv.Point(face.x, face.y);
-    //  let point2 = new cv.Point(face.x + face.width, face.y + face.height);
-    //  cv.rectangle(dst, point1, point2, [255, 0, 0, 255]);
-    //}
+  positionOfFace() {
+    //this._detectFace();
+    if (this.closestFace.found) {
+      return this.closestFace.x;
+    } else {
+      return 0;
+    }
+  }
+
+  distanceOfFace() {
+    //this._detectFace();
+    if (this.closestFace.found) {
+      return this.closestFace.distance;
+    } else {
+      return 101;
+    }
   }
   
   positionOfWhiteline() { // reutn -100 to 100. notfound=0
@@ -92,14 +138,18 @@ class ObnizAIHelper {
   /* tensorflow */
   
   async classify() {
-    // http://starpentagon.net/analytics/imagenet_ilsvrc2012_dataset/
-    const predictions = await this._mobileNet.classify(this.video);
-    for (let i=0; i<predictions.length; i++) {
-      const name = predictions[i].className;
-      const probability = predictions[i].probability;
-      return name;
+    if (this.tfclassify.time !== this.video.currentTime ) {
+      // http://starpentagon.net/analytics/imagenet_ilsvrc2012_dataset/
+      const predictions = await this._mobileNet.classify(this.video);
+      for (let i=0; i<predictions.length; i++) {
+        const name = predictions[i].className;
+        const probability = predictions[i].probability;
+        this.tfclassify.time = this.video.currentTime;
+        this.tfclassify.name = name;
+        break;
+      }
     }
-    return 'unknown';
+    return this.tfclassify.name;
   }
   
   /* speech */
