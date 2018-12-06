@@ -89,14 +89,14 @@ class ObnizAIHelper {
       this._cv_classifier.detectMultiScale(gray, faces, 1.1, 3, 0, msize, msize);
   
       this.closestFace.found = false;
-      this.closestFace.distance = 100;
+      this.closestFace.distance = 101;
       for (let i = 0; i < faces.size(); ++i) {
         let face = faces.get(i);
         const distance = (video.width - face.width) / video.width * 100;
         if (distance < this.closestFace.distance) {
           this.closestFace.found = true;
-          this.closestFace.x = ((face.x + face.width/2)/video.width)*2 - 1;
-          this.closestFace.y = ((face.y + face.height/2)/video.height)*2 - 1;
+          this.closestFace.x = (((face.x + face.width/2)/video.width)*2 - 1)*100;
+          this.closestFace.y = (((face.y + face.height/2)/video.height)*2 - 1)*100;
           this.closestFace.distance = distance;
         }
       }

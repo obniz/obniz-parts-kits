@@ -10,6 +10,10 @@ obniz.onconnect = async function () {
   robot.move("forward");// or "back"
   await obniz.wait(2000);
   robot.turn("right");// or "left"
+  await obniz.wait(2000);
+  robot.move(60, 60);
+  await obniz.wait(2000);
+  robot.move(-60, -60);
 }
 ```
 
