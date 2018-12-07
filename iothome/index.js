@@ -137,7 +137,8 @@ class IoTHomeKit {
     form.append('file', new Blob([JSON.stringify(this._storageCache)]), this.cloudStorageFileName);
     await fetch('/users/me/repo/'+this.cloudStorageFileName,{
       method: "POST",
-      body: form
+      body: form,
+      credentials: "include"
     })
   }
   
@@ -146,7 +147,7 @@ class IoTHomeKit {
       return;
     }
     let response;
-    response = await fetch('/users/me/repo/'+this.cloudStorageFileName,{ method: "GET" })
+    response = await fetch('/users/me/repo/'+this.cloudStorageFileName,{ method: "GET", credentials: "include" })
     if (response.status == 200) {
       this._storageCache = await response.json();
     } else if (response.status == 404) {
@@ -166,7 +167,8 @@ class IoTHomeKit {
 
     await fetch('/users/me/repo/'+this.cloudStorageFileName,{
       method: "POST",
-      body: form
+      body: form,
+      credentials: "include"
     })
   }
   
