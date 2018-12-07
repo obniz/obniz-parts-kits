@@ -104,9 +104,9 @@ class IoTHomeKit {
   
   flag(posture) {
     if (posture === "up") {
-      this.servo.angle(0);
-    } else if (posture === "down") {
       this.servo.angle(90);
+    } else if (posture === "down") {
+      this.servo.angle(0);
     }
   }
   
