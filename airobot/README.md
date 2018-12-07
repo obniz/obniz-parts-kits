@@ -1,4 +1,4 @@
-# sdk for IoT Home Kit 
+# sdk for AI Robot Kit 
 
 ## Overview
 
