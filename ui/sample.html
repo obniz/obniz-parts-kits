@@ -17,10 +17,10 @@
 <script>
   (async function(){
     var button = new ObnizButton("すすめあいう");
+    var label = new ObnizLabel("もじ");
 
     var button2 = new ObnizButton("すすめ");
 
-    while(1){
       if(button.isClicked()){
         console.log("clicked");
       }
@@ -28,8 +28,8 @@
         console.log("touching");
 
       }
+    label.setText("test")
       await ObnizUtil.wait(1000);
-    }
   })();
 
 </script>

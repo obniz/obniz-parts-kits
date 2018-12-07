@@ -1,11 +1,11 @@
-var obniz_button_counter = 0;
+var obniz_ui_counter = 0;
 
 class ObnizButton {
   constructor(text, size) {
     this.size = (size || "M").toUpperCase();
-    this.no = obniz_button_counter;
+    this.no = obniz_ui_counter;
     this.text = text;
-    obniz_button_counter++;
+    obniz_ui_counter++;
     this.pushed = false;
     this.clicked = false;
 
@@ -69,6 +69,37 @@ class ObnizButton {
 
 }
 
+
+class ObnizLabel {
+  constructor(text, size) {
+    this.no = obniz_ui_counter;
+    this.text = text;
+    obniz_ui_counter++;
+    this.pushed = false;
+    this.clicked = false;
+
+    this.addLabel();
+
+  }
+
+
+  addLabel(){
+    var output = document.getElementById("OBNIZ_OUTPUT");
+    var button = document.createElement("div");
+    button.id = 'obniz_label_'+this.no;
+    button.style = "font-size:30px;padding:10px";
+    button.className="";
+    button.innerText = this.text;
+    output.appendChild(button);
+  }
+
+  setText(text){
+    $('#obniz_label_'+this.no).text(text);
+  }
+
+}
+
+
 var ObnizUtil  = {
   wait : function(ms){
     return new Promise(resolve => setTimeout(() => resolve(), ms));
@@ -78,5 +109,6 @@ var ObnizUtil  = {
 
 var ObnizUI = {
   Button : ObnizButton,
+  Label : ObnizLabel,
   Util : ObnizUtil,
 }
