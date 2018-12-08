@@ -130,7 +130,11 @@ class IoTHomeKit {
   irSend(arr) {
     this.irmodule.send(arr);
   }
-  
+
+
+  /**
+   * 互換性のために残す
+   */
   async _createStorage() {
     this._storageCache = {};
     let form = new FormData();
