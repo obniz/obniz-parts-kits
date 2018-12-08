@@ -186,7 +186,7 @@ class ObnizAIHelper {
     const data = await res.json();
 
     const forecast = data.query.results.channel.item.forecast[0].text;
-    return forecast;
+    return forecast.toLowerCase();
   }
 
   addWeatherList() {
