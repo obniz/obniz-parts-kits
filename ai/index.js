@@ -202,7 +202,7 @@ class ObnizAIHelper {
       "mostly cloudy (day)",
       "partly cloudy (night)",
       "partly cloudy (day)",
-      "partly cloudy",
+      "mostly cloudy",
       "partly cloudy",
     ];
 
