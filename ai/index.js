@@ -192,6 +192,7 @@ class ObnizAIHelper {
   addWeatherList() {
     this.sunny = [
       "clear (night)",
+      "clear",
       "sunny",
     ];
 
@@ -201,6 +202,7 @@ class ObnizAIHelper {
       "mostly cloudy (day)",
       "partly cloudy (night)",
       "partly cloudy (day)",
+      "partly cloudy",
       "partly cloudy",
     ];
 
