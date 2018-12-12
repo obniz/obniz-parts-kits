@@ -75,9 +75,9 @@ var ObnizUI = {};
 
 
   class ObnizLabel {
-    constructor(text, size) {
+    constructor(text) {
       this.no = obniz_ui_counter;
-      this.text = text;
+      this.text = text || "label";
       obniz_ui_counter++;
       this.pushed = false;
       this.clicked = false;
