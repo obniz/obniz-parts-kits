@@ -168,13 +168,11 @@ class ObnizAIHelper {
       if (typeof pitch === "number") {
         message.pitch = pitch;
       }
-      message.onend = () => {
-        resolve();
-      }
       message.onerror = (err) => {
         reject(err);
       }
       synth.speak(message);
+      resolve();
     })
   }
 
