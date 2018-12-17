@@ -68,14 +68,16 @@ class ObnizAIHelper {
 
   _startVideo() {
     const video = this.video;
-    navigator.mediaDevices = navigator.mediaDevices || ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
-      getUserMedia: function (c) {
-        return new Promise(function (y, n) {
-          (navigator.mozGetUserMedia ||
-            navigator.webkitGetUserMedia).call(navigator, c, y, n);
-        });
-      }
-    } : null);
+    if(!navigator.mediaDevices) {
+      navigator.mediaDevices = ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
+        getUserMedia: function (c) {
+          return new Promise(function (y, n) {
+            (navigator.mozGetUserMedia ||
+              navigator.webkitGetUserMedia).call(navigator, c, y, n);
+          });
+        }
+      } : null);
+    }
     return new Promise(async (resolve, reject) => {
       const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "user"}, audio: false});
       video.srcObject = stream;
