@@ -18,6 +18,10 @@ class ObnizAIHelper {
       y: 0,
       distance: 0
     }
+    
+    this.detectedWhiteLine = {
+      center_x: 0
+    }
 
     this.addWeatherList();
   }
@@ -136,7 +140,48 @@ class ObnizAIHelper {
   }
 
   positionOfWhiteline() { // reutn -100 to 100. notfound=0
-    return 0;
+    
+    const video = this.video;
+    if (this.closestFace.time !== this.video.currentTime) {
+      this.closestFace.time = this.video.currentTime;
+
+      const cap = this.cap;
+      let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+      let gray = new cv.Mat();
+      
+      cap.read(src);
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+      
+      let window = parseInt(video.width * 0.05);
+      
+      let boundary = [1,1,1];
+      let max_bright = 0;
+      let max_bright_x = 0; 
+      const roi_h = parseInt(video.height*(0.7));
+      console.log("start");
+      for (let col = 0; col < (video.width-window); col++) {
+        let lastBoundary = 255;
+        let pixel = 0;
+        for (let w = 0; w<window; w++) {
+          pixel += gray.ucharPtr(roi_h, col + w)[0]
+        }
+        pixel /= window;
+        if (max_bright < pixel) {
+          max_bright = pixel;
+          max_bright_x = col;
+        }
+      }
+      
+      let center_x = max_bright_x + parseInt(window/2);
+      center_x = ((center_x / video.width) * 2 - 1) * 100;
+      
+      this.detectedWhiteLine.center_x = parseInt(center_x);
+      
+      gray.delete();
+      src.delete();
+    }
+    
+    return this.detectedWhiteLine.center_x;
   }
 
   /* tensorflow */
