@@ -233,13 +233,32 @@ class ObnizAIHelper {
 
   /* API related */
 
-  async getWeather(region) {
-    /* https://developer.yahoo.com/weather/documentation.html#codes */
-    const res = await fetch("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22" + region + "%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys")
-    const data = await res.json();
 
-    const forecast = data.query.results.channel.item.forecast[0].text;
-    return forecast.toLowerCase();
+  async getLatLng(place) {
+
+    var key = "AIzaSyC0BmxlTmV1i9gChYnZdCqvPjCOr4xt7ak";
+    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + place + "+CA&key=" + key ;
+
+    var json = await fetch(url, {mode: 'cors'}).then((res)=>res.json());
+
+    if(!json || !json.results || ! json.results[0] || !json.results[0].geometry || !json.results[0].geometry.location){
+      return null;
+    }
+    return json.results[0].geometry.location;
+  }
+
+  async getWeather(region) {
+
+    const key = "4aa1a96a50432353baf849e808c112e5";
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${region}&APPID=${key}`;
+    var response = await fetch(url);
+    var json = await response.json();
+
+    if(!json || !json.list || ! json.list[0] || !json.list[0].weather|| !json.list[0].weather[0]){
+      return "unknown";
+    }
+    return json.list[0].weather[0].main.toLowerCase();
+
   }
 
   addWeatherList() {
@@ -257,6 +276,7 @@ class ObnizAIHelper {
       "partly cloudy (day)",
       "mostly cloudy",
       "partly cloudy",
+      "clouds",
     ];
 
     this.rain = [
@@ -268,6 +288,9 @@ class ObnizAIHelper {
       "showers",
       "mixed rain and hail",
       "scattered showers",
+      "atmosphere",
+      "rain",
+      "thunderstorm",
     ];
 
     this.snow = [
@@ -279,6 +302,7 @@ class ObnizAIHelper {
       "heavy snow",
       "scattered snow showers",
       "snow showers",
+
     ];
   }
 
