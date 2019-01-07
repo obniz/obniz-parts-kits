@@ -46,7 +46,7 @@ class ObnizAIHelper {
 
   _prepareDOM() {
     var div = document.createElement('div');
-    div.innerHTML = `<video id="video_forairobotkit" width="320px" height="240px" autoplay playsinline></video>`;
+    div.innerHTML = `<video id="video_forairobotkit" width="320px" height="240px" autoplay playsinline style="background-color: #888"></video>`;
     const viodeDOM = div.firstChild;
     var output = document.getElementById("OBNIZ_OUTPUT");
     output.appendChild(viodeDOM);
