@@ -1,6 +1,6 @@
 {
   "name": "obniz-parts-kits",
-  "version": "0.11.1",
+  "version": "0.11.2",
   "description": "sdk for obniz ai/iot kits",
   "main": "index.js",
   "scripts": {},
