@@ -242,19 +242,6 @@ class ObnizAIHelper {
   /* API related */
 
 
-  async getLatLng(place) {
-
-    var key = "AIzaSyC0BmxlTmV1i9gChYnZdCqvPjCOr4xt7ak";
-    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + place + "+CA&key=" + key ;
-
-    var json = await fetch(url, {mode: 'cors'}).then((res)=>res.json());
-
-    if(!json || !json.results || ! json.results[0] || !json.results[0].geometry || !json.results[0].geometry.location){
-      return null;
-    }
-    return json.results[0].geometry.location;
-  }
-
   async getWeather(region) {
 
     const key = "4aa1a96a50432353baf849e808c112e5";
