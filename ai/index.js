@@ -30,10 +30,18 @@ class ObnizAIHelper {
   /* Cam Management */
 
   async startCamWait() {
-    this._prepareDOM();
-    await this._loadModel();
-    await this._startVideo();
-    this.cap = new cv.VideoCapture(this.video);
+    try{
+      this._prepareDOM();
+      await this._loadModel();
+      await this._startVideo();
+      this.cap = new cv.VideoCapture(this.video);
+    } catch(e){
+      var div = document.createElement('div');
+      div.innerHTML = `Cannot start camera on your device.`;
+      const viodeDOM = div.firstChild;
+      var output = document.getElementById("OBNIZ_OUTPUT");
+      output.appendChild(viodeDOM);
+    }
   }
 
   _prepareDOM() {
@@ -305,7 +313,6 @@ class ObnizAIHelper {
 
     ];
   }
-
 }
 
 if (typeof module === 'object') {
