@@ -13,7 +13,18 @@
 
 <div id="OBNIZ_OUTPUT"></div>
 
+<button onclick="play()">play</button>
 <script>
+  async function play(){
+    await _ai.playAudio(261,500)
+    await _ai.playAudio(293,500)
+    await _ai.playAudio(329,500)
+    await _ai.playAudio(349,500)
+    await _ai.playAudio(391,500)
+    await _ai.playAudio(440,500)
+    await _ai.playAudio(493,500)
+    await _ai.playAudio(523,500)
+  }
   (async function(){
 
     // weather forecast
@@ -22,6 +33,7 @@
 
     // say
     await _ai.say(weather);
+    await play();
 
     // Vision
     await _ai.startCamWait();

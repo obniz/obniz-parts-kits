@@ -18,8 +18,11 @@
   (async function(){
     var button = new ObnizUI.Button("すすめあいう");
     var label = new ObnizUI.Label("もじ");
+    var slider = new ObnizUI.Slider();
 
     var button2 = new ObnizUI.Button("すすめ");
+
+    var img = new ObnizUI.Image("https://obniz.io/images/index/index-obniz-front.png?rev=f1cdce7788c0dc1350b5c97e631754946e36ef50");
 
       if(button.isClicked()){
         console.log("clicked");
@@ -28,8 +31,19 @@
         console.log("touching");
 
       }
-    label.setText("test")
-    await ObnizUI.Util.wait(1000);
+    label.setText("test");
+      let i=0;
+      while(1){
+        i += 0.1;
+        await ObnizUI.Util.wait(10);
+        if(slider.isChanged()){
+          console.log(slider.getValue());
+        }
+        img.addX((Math.sin(i) )*10);
+        img.addY((Math.cos(i))*10);
+        img.addRotate(1);
+
+      }
   })();
 
 </script>

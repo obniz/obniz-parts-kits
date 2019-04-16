@@ -18,24 +18,28 @@ class ObnizAIHelper {
       y: 0,
       distance: 0
     }
-    
+
     this.detectedWhiteLine = {
       center_x: 0
     }
 
+
     this.addWeatherList();
+
+    let AudioContext = window.AudioContext || window.webkitAudioContext; //クロスブラウザ対応
+    this.audioCtx = new AudioContext();
   }
 
 
   /* Cam Management */
 
   async startCamWait() {
-    try{
+    try {
       this._prepareDOM();
       await this._loadModel();
       await this._startVideo();
       this.cap = new cv.VideoCapture(this.video);
-    } catch(e){
+    } catch (e) {
       var div = document.createElement('div');
       div.innerHTML = `Cannot start camera on your device.`;
       const viodeDOM = div.firstChild;
@@ -76,12 +80,12 @@ class ObnizAIHelper {
 
   _startVideo() {
     const video = this.video;
-    if(!navigator.mediaDevices) {
+    if (!navigator.mediaDevices) {
       navigator.mediaDevices = ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
         getUserMedia: function (c) {
           return new Promise(function (y, n) {
             (navigator.mozGetUserMedia ||
-              navigator.webkitGetUserMedia).call(navigator, c, y, n);
+                navigator.webkitGetUserMedia).call(navigator, c, y, n);
           });
         }
       } : null);
@@ -158,7 +162,7 @@ class ObnizAIHelper {
   }
 
   positionOfWhiteline() { // reutn -100 to 100. notfound=0
-    
+
     const video = this.video;
     if (this.closestFace.time !== this.video.currentTime) {
       this.closestFace.time = this.video.currentTime;
@@ -166,21 +170,21 @@ class ObnizAIHelper {
       const cap = this.cap;
       let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
       let gray = new cv.Mat();
-      
+
       cap.read(src);
       cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-      
+
       let window = parseInt(video.width * 0.05);
-      
-      let boundary = [1,1,1];
+
+      let boundary = [1, 1, 1];
       let max_bright = 0;
-      let max_bright_x = 0; 
-      const roi_h = parseInt(video.height*(0.7));
+      let max_bright_x = 0;
+      const roi_h = parseInt(video.height * (0.7));
       console.log("start");
-      for (let col = 0; col < (video.width-window); col++) {
+      for (let col = 0; col < (video.width - window); col++) {
         let lastBoundary = 255;
         let pixel = 0;
-        for (let w = 0; w<window; w++) {
+        for (let w = 0; w < window; w++) {
           pixel += gray.ucharPtr(roi_h, col + w)[0]
         }
         pixel /= window;
@@ -189,16 +193,16 @@ class ObnizAIHelper {
           max_bright_x = col;
         }
       }
-      
-      let center_x = max_bright_x + parseInt(window/2);
+
+      let center_x = max_bright_x + parseInt(window / 2);
       center_x = ((center_x / video.width) * 2 - 1) * 100;
-      
+
       this.detectedWhiteLine.center_x = parseInt(center_x);
-      
+
       gray.delete();
       src.delete();
     }
-    
+
     return this.detectedWhiteLine.center_x;
   }
 
@@ -249,7 +253,7 @@ class ObnizAIHelper {
     var response = await fetch(url);
     var json = await response.json();
 
-    if(!json || !json.list || ! json.list[0] || !json.list[0].weather|| !json.list[0].weather[0]){
+    if (!json || !json.list || !json.list[0] || !json.list[0].weather || !json.list[0].weather[0]) {
       return "unknown";
     }
     return json.list[0].weather[0].main.toLowerCase();
@@ -300,6 +304,38 @@ class ObnizAIHelper {
 
     ];
   }
+
+
+  playAudio(hz, ms) {
+
+    return new Promise(resolve => {
+
+      //正弦波の音を作成
+      var osciillator = this.audioCtx.createOscillator();
+
+      //ヘルツ（周波数）指定
+      osciillator.frequency.value = hz;
+
+      //音の出力先
+      var audioDestination = this.audioCtx.destination;
+
+      //出力先のスピーカーに接続
+      osciillator.connect(audioDestination);
+
+      //音を出す
+      osciillator.start = osciillator.start || osciillator.noteOn; //クロスブラウザ対応
+      osciillator.start();
+
+
+      //音を0.5秒後にストップ
+      setTimeout(function () {
+        osciillator.stop();
+        resolve();
+      }, ms);
+
+    })
+  }
+
 }
 
 if (typeof module === 'object') {
