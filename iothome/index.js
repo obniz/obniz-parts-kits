@@ -13,7 +13,7 @@ class IoTHomeKit {
     
     this._proximityEnums = [
       {
-        name: "immidiate",
+        name: "immediate",
         max: 150,
       },{
         name: "near",
