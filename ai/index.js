@@ -9,7 +9,7 @@ class ObnizAIHelper {
     this.tfclassify = {
       time: null,
       name: 'unknown'
-    }
+    };
 
     this.closestFace = {
       time: null,
@@ -17,11 +17,11 @@ class ObnizAIHelper {
       x: 0,
       y: 0,
       distance: 0
-    }
+    };
 
     this.detectedWhiteLine = {
       center_x: 0
-    }
+    };
 
 
     this.addWeatherList();
@@ -335,6 +335,18 @@ class ObnizAIHelper {
 
     })
   }
+
+  playMusic(url) {
+    return new Promise((resolve) => {
+      new Howl({
+        src: [url],
+        autoplay: true,
+        loop: false,
+        onend: resolve
+      });
+    });
+  }
+
 
 }
 

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Sample</title>
   <script src="opencv3.4/opencv.js"></script>
+  <script src="howler2.1.2/howler.js"></script>
   <script src="index.js"></script>
   <script src="../ui/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.5"> </script>
@@ -14,16 +15,21 @@
 <div id="OBNIZ_OUTPUT"></div>
 
 <button onclick="play()">play</button>
+<button onclick="playMusic()">playMusic</button>
 <script>
+
+  async function playMusic(){
+    await _ai.playMusic('xxx.mp3');
+  }
   async function play(){
-    await _ai.playAudio(261,500)
-    await _ai.playAudio(293,500)
-    await _ai.playAudio(329,500)
-    await _ai.playAudio(349,500)
-    await _ai.playAudio(391,500)
-    await _ai.playAudio(440,500)
-    await _ai.playAudio(493,500)
-    await _ai.playAudio(523,500)
+    await _ai.playAudio(261,500);
+    await _ai.playAudio(293,500);
+    await _ai.playAudio(329,500);
+    await _ai.playAudio(349,500);
+    await _ai.playAudio(391,500);
+    await _ai.playAudio(440,500);
+    await _ai.playAudio(493,500);
+    await _ai.playAudio(523,500);
   }
   (async function(){
 
@@ -35,6 +41,7 @@
     await _ai.say(weather);
     await play();
 
+    await playMusic('xxx.mp3');
     // Vision
     await _ai.startCamWait();
     
