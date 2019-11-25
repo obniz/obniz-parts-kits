@@ -22,31 +22,22 @@
     _ai.startMotionWait()
   }
   window.onload = function(){
-    initVConsole();
+
     (async function(){
 
       await _ai.startMotionWait();
       while(true) {
-        // face detection
+        if(_ai.isShaked()){
+          document.body.style.backgroundColor = "red";
+        }else{
+          document.body.style.backgroundColor = "white";
+        }
         console.log("shaked : "  + _ai.isShaked());
-        console.log(_ai.isFaceUp())
         await new Promise((resolve)=>{setTimeout(resolve, 100)})
       }
     })();
   }
-  // Initialize vConsole
-  function initVConsole() {
-    window.vConsole = new window.VConsole({
-      defaultPlugins: ['system', 'network', 'element', 'storage'],
-      maxLogNumber: 1000,
-      onReady: function() {
-        console.log('vConsole is ready.');
-      },
-      onClearLog: function() {
-        console.log('on clearLog');
-      }
-    });
-  }
+
 
 
 
