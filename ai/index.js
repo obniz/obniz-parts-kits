@@ -2,6 +2,15 @@ class ObnizAIHelper {
 
   constructor() {
 
+
+    this.tracker = new clm.tracker();
+    this.tracker.init(pModel);
+    this._emotionThreshold = 0.5;
+
+
+    this._emotion_classifier = new emotionClassifier();
+    this._emotion_classifier.init(emotionModel);
+
     /* tfjs */
     this.tfModel = undefined;
     this.video = undefined;
@@ -28,6 +37,25 @@ class ObnizAIHelper {
 
     let AudioContext = window.AudioContext || window.webkitAudioContext; //クロスブラウザ対応
     this.audioCtx = new AudioContext();
+
+    this.accel = {
+      x: null,
+      y: null,
+      z: null,
+      logs: [],
+    };
+    this.gyro = {
+      alpha: null,
+      beta: null,
+      gamma: null,
+      logs: [],
+    };
+    this.orientation = {
+      absolute: null,
+      alpha: null,
+      beta: null,
+      gamma: null,
+    }
   }
 
 
@@ -39,6 +67,7 @@ class ObnizAIHelper {
       await this._loadModel();
       await this._startVideo();
       this.cap = new cv.VideoCapture(this.video);
+      this.tracker.start(this.video);
     } catch (e) {
       var div = document.createElement('div');
       div.innerHTML = `Cannot start camera on your device.`;
@@ -138,8 +167,53 @@ class ObnizAIHelper {
     }
   }
 
+  isAngry(){
+    return this.emotions.angly > this._emotionThreshold;
+  }
+
+  isSad(){
+    return this.emotions.sad > this._emotionThreshold;
+  }
+
+  isHappy(){
+    return this.emotions.happy > this._emotionThreshold;
+  }
+
+  isDisgusted(){
+    return this.emotions.disgusted > this._emotionThreshold;
+  }
+
+  isFear(){
+    return this.emotions.fear > this._emotionThreshold;
+  }
+
+  isSurprised(){
+    return this.emotions.surprised > this._emotionThreshold;
+  }
+
+
+  _detectEmotion(){
+
+
+
+    var positions = this.tracker.getCurrentPosition();
+    var parameters = this.tracker.getCurrentParameters();
+    var emotion = this._emotion_classifier.meanPredict(parameters);
+
+    var emotions = {};
+    for (var i=0; i<emotion.length; i++) {
+      emotions[emotion[i].emotion] = emotion[i].value;
+    }
+
+    this.emotions = emotions;
+
+
+  }
+
+
   isFaceInside() {
     this._detectFace();
+    this._detectEmotion();
     return this.closestFace.found;
   }
 
@@ -345,6 +419,131 @@ class ObnizAIHelper {
         onend: resolve
       });
     });
+  }
+
+
+  /* Accel */
+
+
+  async startMotionWait(){
+    const requestDeviceMotionPermission = () => {
+      if (
+          DeviceMotionEvent &&
+          typeof DeviceMotionEvent.requestPermission === 'function'
+      ) {
+
+        DeviceMotionEvent.requestPermission()
+            .then(permissionState => {
+              if (permissionState === 'granted') {
+                // 許可を得られた場合、devicemotionをイベントリスナーに追加
+                window.addEventListener('devicemotion', this.onDeviceMotion.bind(this))
+              } else {
+                // 許可を得られなかった場合の処理
+              }
+            })
+            .catch(console.error)
+
+        DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+              if (permissionState === 'granted') {
+                // 許可を得られた場合、deviceorientationをイベントリスナーに追加
+                window.addEventListener('deviceorientation', this.onDeviceOrientation.bind(this))
+              } else {
+                // 許可を得られなかった場合の処理
+              }
+            }).catch(console.error)
+      } else {
+        window.addEventListener('devicemotion', this.onDeviceMotion.bind(this));
+        window.addEventListener("deviceorientation",  this.onDeviceOrientation.bind(this));
+      }
+    }
+    requestDeviceMotionPermission();
+  }
+
+  onDeviceMotion(e){
+    // console.log("onDeviceMotion")
+
+    let now = new Date();
+
+    let accel =  e.acceleration;
+    accel.time = now;
+
+    let gyro =  e.rotationRate;
+    gyro.time = now;
+
+    this.accel.x = accel.x;
+    this.accel.y = accel.y;
+    this.accel.z = accel.z;
+    this.accel.logs.push(accel);
+
+    this.gyro.alpha = gyro.alpha;
+    this.gyro.beta = gyro.beta;
+    this.gyro.gamma = gyro.gamma;
+    this.gyro.logs.push(gyro);
+
+    this.deviceMotionLogFilter();
+
+  }
+  onDeviceOrientation(e){
+
+    this.orientation = {
+      absolute: e.absolute,
+      alpha: e.alpha,
+      beta: e.beta,
+      gamma: e.gamma,
+    }
+
+  }
+
+  deviceMotionLogFilter(){
+    let now = new Date();
+    let time = 1000;
+
+    this.accel.logs = this.accel.logs.filter((elm) => {
+      return elm.time.getTime() + time > now.getTime();
+    })
+
+    this.gyro.logs = this.gyro.logs.filter((elm) => {
+      return elm.time.getTime() + time > now.getTime();
+    })
+
+  }
+
+  getAccelX(){
+    return this.accel.x;
+  }
+  getAccelY(){
+    return this.accel.y;
+  }
+  getAccelZ(){
+    return this.accel.z;
+  }
+
+  getGyroAlpha(){
+    return this.gyro.alpha;
+  }
+  getGyroBeta(){
+    return this.gyro.beta;
+  }
+  getGyroGannma(){
+    return this.gyro.gamma;
+  }
+
+  isShaked(){
+    let maxX = this.accel.logs.reduce((a,b)=>a.x>b.x?a:b,{}).x;
+    let maxY = this.accel.logs.reduce((a,b)=>a.y>b.y?a:b,{}).y;
+    let maxZ = this.accel.logs.reduce((a,b)=>a.z>b.z?a:b,{}).z;
+    let minX = this.accel.logs.reduce((a,b)=>a.x<b.x?a:b,{}).x;
+    let minY = this.accel.logs.reduce((a,b)=>a.y<b.y?a:b,{}).y;
+    let minZ = this.accel.logs.reduce((a,b)=>a.z<b.z?a:b,{}).z;
+
+    // console.log({maxX, minX})
+
+    if(maxX - minX > 6 || maxY - minY > 6 || maxZ - minZ > 6 ){
+      return true;
+    }
+
+    return false;
   }
 
 

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sample</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <script src="opencv3.4/opencv.js"></script>
+  <script src="howler2.1.2/howler.js"></script>
+  <script src="index.js"></script>
+  <script src="../ui/index.js"></script>
+
+
+</head>
+<body>
+
+<div id="OBNIZ_OUTPUT"></div>
+
+<button onclick="request()">request</button>
+<script>
+  function request(){
+    _ai.startMotionWait()
+  }
+  window.onload = function(){
+    initVConsole();
+    (async function(){
+
+      await _ai.startMotionWait();
+      while(true) {
+        // face detection
+        console.log("shaked : "  + _ai.isShaked());
+        console.log(_ai.isFaceUp())
+        await new Promise((resolve)=>{setTimeout(resolve, 100)})
+      }
+    })();
+  }
+  // Initialize vConsole
+  function initVConsole() {
+    window.vConsole = new window.VConsole({
+      defaultPlugins: ['system', 'network', 'element', 'storage'],
+      maxLogNumber: 1000,
+      onReady: function() {
+        console.log('vConsole is ready.');
+      },
+      onClearLog: function() {
+        console.log('on clearLog');
+      }
+    });
+  }
+
+
+
+</script>
+
+</body>
+</html>
