@@ -56,6 +56,15 @@ class ObnizAIHelper {
       beta: null,
       gamma: null,
     }
+
+    this.emotions = {
+      angly :0,
+      sad :0,
+      disgusted :0,
+      fear :0,
+      surprised :0,
+    }
+
   }
 
 
@@ -168,22 +177,27 @@ class ObnizAIHelper {
   }
 
   isAngry(){
+    _detectFace();
     return this.emotions.angly > this._emotionThreshold;
   }
 
   isSad(){
+    _detectFace();
     return this.emotions.sad > this._emotionThreshold;
   }
 
   isHappy(){
+    _detectFace();
     return this.emotions.happy > this._emotionThreshold;
   }
 
   isDisgusted(){
+    _detectFace();
     return this.emotions.disgusted > this._emotionThreshold;
   }
 
   isFear(){
+    _detectFace();
     return this.emotions.fear > this._emotionThreshold;
   }
 
@@ -193,6 +207,7 @@ class ObnizAIHelper {
 
 
   _detectEmotion(){
+    _detectFace();
 
 
 
