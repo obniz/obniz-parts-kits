@@ -63,6 +63,7 @@ class ObnizAIHelper {
       disgusted :0,
       fear :0,
       surprised :0,
+      happy : 0
     }
 
   }
@@ -177,27 +178,27 @@ class ObnizAIHelper {
   }
 
   isAngry(){
-    _detectFace();
+    this._detectEmotion();
     return this.emotions.angly > this._emotionThreshold;
   }
 
   isSad(){
-    _detectFace();
+    this._detectEmotion();
     return this.emotions.sad > this._emotionThreshold;
   }
 
   isHappy(){
-    _detectFace();
+    this._detectEmotion();
     return this.emotions.happy > this._emotionThreshold;
   }
 
   isDisgusted(){
-    _detectFace();
+    this._detectEmotion();
     return this.emotions.disgusted > this._emotionThreshold;
   }
 
   isFear(){
-    _detectFace();
+    this._detectEmotion();
     return this.emotions.fear > this._emotionThreshold;
   }
 
@@ -207,7 +208,7 @@ class ObnizAIHelper {
 
 
   _detectEmotion(){
-    _detectFace();
+    this._detectFace();
 
 
 
@@ -497,7 +498,7 @@ class ObnizAIHelper {
           !DeviceMotionEvent ||
           typeof DeviceMotionEvent.requestPermission !== 'function'
       ) {
-        document.body.click():
+        document.body.click();
       }
 
     });
