@@ -440,39 +440,67 @@ class ObnizAIHelper {
   /* Accel */
 
 
-  async startMotionWait(){
-    const requestDeviceMotionPermission = () => {
-      if (
-          DeviceMotionEvent &&
-          typeof DeviceMotionEvent.requestPermission === 'function'
-      ) {
+  startMotionWait(){
 
-        DeviceMotionEvent.requestPermission()
-            .then(permissionState => {
-              if (permissionState === 'granted') {
-                // 許可を得られた場合、devicemotionをイベントリスナーに追加
-                window.addEventListener('devicemotion', this.onDeviceMotion.bind(this))
-              } else {
-                // 許可を得られなかった場合の処理
-              }
-            })
-            .catch(console.error)
+    return new Promise((resolve,reject)=>{
+      const requestDeviceMotionPermission = (event) => {
 
-        DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-              if (permissionState === 'granted') {
-                // 許可を得られた場合、deviceorientationをイベントリスナーに追加
-                window.addEventListener('deviceorientation', this.onDeviceOrientation.bind(this))
-              } else {
-                // 許可を得られなかった場合の処理
-              }
-            }).catch(console.error)
-      } else {
-        window.addEventListener('devicemotion', this.onDeviceMotion.bind(this));
-        window.addEventListener("deviceorientation",  this.onDeviceOrientation.bind(this));
+        document.body.removeEventListener('touchstart', requestDeviceMotionPermission, true);
+        document.body.removeEventListener('touchend', requestDeviceMotionPermission, true);
+        document.body.removeEventListener('click', requestDeviceMotionPermission, true);
+
+        if (
+            DeviceMotionEvent &&
+            typeof DeviceMotionEvent.requestPermission === 'function'
+        ) {
+
+          DeviceMotionEvent.requestPermission()
+              .then(permissionState => {
+                if (permissionState === 'granted') {
+                  // 許可を得られた場合、devicemotionをイベントリスナーに追加
+                  window.addEventListener('devicemotion', this.onDeviceMotion.bind(this))
+                  resolve();
+                } else {
+                  // 許可を得られなかった場合の処理
+                  reject();
+                }
+              })
+              .catch(( e )=>{
+              })
+
+          DeviceOrientationEvent.requestPermission()
+              .then(permissionState => {
+                if (permissionState === 'granted') {
+                  // 許可を得られた場合、deviceorientationをイベントリスナーに追加
+                  window.addEventListener('deviceorientation', this.onDeviceOrientation.bind(this))
+                  resolve();
+                } else {
+                  // 許可を得られなかった場合の処理
+                  reject();
+
+                }
+              }).catch(( e )=>{
+          })
+        } else {
+          window.addEventListener('devicemotion', this.onDeviceMotion.bind(this));
+          window.addEventListener("deviceorientation",  this.onDeviceOrientation.bind(this));
+          resolve();
+        }
       }
-    }
-    requestDeviceMotionPermission();
+
+      // Setup a touch start listener to attempt an unlock in.
+      document.body.addEventListener('touchstart', requestDeviceMotionPermission, true);
+      document.body.addEventListener('touchend', requestDeviceMotionPermission, true);
+      document.body.addEventListener('click', requestDeviceMotionPermission, true);
+
+      if (
+          !DeviceMotionEvent ||
+          typeof DeviceMotionEvent.requestPermission !== 'function'
+      ) {
+        document.body.click():
+      }
+
+    });
   }
 
   onDeviceMotion(e){
@@ -558,6 +586,15 @@ class ObnizAIHelper {
       return true;
     }
 
+    return false;
+  }
+
+  isDeviceFaceDirection(dir){
+    if(dir === "sky"){
+      return Math.abs(this.orientation.beta) < 10 && Math.abs(this.orientation.gamma) < 10 ;
+    }else if(dir === "earth"){
+      return Math.abs(this.orientation.beta) > 170 && Math.abs(this.orientation.gamma) < 10 ;
+    }
     return false;
   }
 
