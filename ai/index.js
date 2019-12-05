@@ -58,12 +58,12 @@ class ObnizAIHelper {
     }
 
     this.emotions = {
-      angly :0,
-      sad :0,
-      disgusted :0,
-      fear :0,
-      surprised :0,
-      happy : 0
+      angly: 0,
+      sad: 0,
+      disgusted: 0,
+      fear: 0,
+      surprised: 0,
+      happy: 0
     }
 
   }
@@ -177,39 +177,42 @@ class ObnizAIHelper {
     }
   }
 
-  isAngry(){
+  isAngry() {
+    return isEmotionDetected("angly");
+  }
+
+  isSad() {
+    return isEmotionDetected("sad");
+  }
+
+  isHappy() {
+    return isEmotionDetected("happy");
+  }
+
+  isDisgusted() {
+    return isEmotionDetected("disgusted");
+  }
+
+  isFear() {
+    return isEmotionDetected("fear");
+  }
+
+  isSurprised() {
+    return isEmotionDetected("surprised");
+  }
+
+  getEmotionValue(emotionType) {
     this._detectEmotion();
-    return this.emotions.angly > this._emotionThreshold;
+    return this.emotions[emotionType];
   }
 
-  isSad(){
-    this._detectEmotion();
-    return this.emotions.sad > this._emotionThreshold;
-  }
-
-  isHappy(){
-    this._detectEmotion();
-    return this.emotions.happy > this._emotionThreshold;
-  }
-
-  isDisgusted(){
-    this._detectEmotion();
-    return this.emotions.disgusted > this._emotionThreshold;
-  }
-
-  isFear(){
-    this._detectEmotion();
-    return this.emotions.fear > this._emotionThreshold;
-  }
-
-  isSurprised(){
-    return this.emotions.surprised > this._emotionThreshold;
+  isEmotionDetected(emotionType) {
+    return this.getEmotionValue(emotionType) > this._emotionThreshold;
   }
 
 
-  _detectEmotion(){
+  _detectEmotion() {
     this._detectFace();
-
 
 
     var positions = this.tracker.getCurrentPosition();
@@ -217,7 +220,7 @@ class ObnizAIHelper {
     var emotion = this._emotion_classifier.meanPredict(parameters);
 
     var emotions = {};
-    for (var i=0; i<emotion.length; i++) {
+    for (var i = 0; i < emotion.length; i++) {
       emotions[emotion[i].emotion] = emotion[i].value;
     }
 
@@ -441,78 +444,96 @@ class ObnizAIHelper {
   /* Accel */
 
 
-  startMotionWait(){
+  async startMotionWait() {
 
-    return new Promise((resolve,reject)=>{
-      const requestDeviceMotionPermission = (event) => {
-
-        document.body.removeEventListener('touchstart', requestDeviceMotionPermission, true);
-        document.body.removeEventListener('touchend', requestDeviceMotionPermission, true);
-        document.body.removeEventListener('click', requestDeviceMotionPermission, true);
-
-        if (
-            DeviceMotionEvent &&
-            typeof DeviceMotionEvent.requestPermission === 'function'
-        ) {
-
-          DeviceMotionEvent.requestPermission()
-              .then(permissionState => {
-                if (permissionState === 'granted') {
-                  // 許可を得られた場合、devicemotionをイベントリスナーに追加
-                  window.addEventListener('devicemotion', this.onDeviceMotion.bind(this))
-                  resolve();
-                } else {
-                  // 許可を得られなかった場合の処理
-                  reject();
-                }
-              })
-              .catch(( e )=>{
-              })
-
-          DeviceOrientationEvent.requestPermission()
-              .then(permissionState => {
-                if (permissionState === 'granted') {
-                  // 許可を得られた場合、deviceorientationをイベントリスナーに追加
-                  window.addEventListener('deviceorientation', this.onDeviceOrientation.bind(this))
-                  resolve();
-                } else {
-                  // 許可を得られなかった場合の処理
-                  reject();
-
-                }
-              }).catch(( e )=>{
-          })
-        } else {
-          window.addEventListener('devicemotion', this.onDeviceMotion.bind(this));
-          window.addEventListener("deviceorientation",  this.onDeviceOrientation.bind(this));
-          resolve();
-        }
-      }
-
-      // Setup a touch start listener to attempt an unlock in.
-      document.body.addEventListener('touchstart', requestDeviceMotionPermission, true);
-      document.body.addEventListener('touchend', requestDeviceMotionPermission, true);
-      document.body.addEventListener('click', requestDeviceMotionPermission, true);
-
+    try {
+      await this._confirmPrompt("This app request permission of device motions");
       if (
-          !DeviceMotionEvent ||
-          typeof DeviceMotionEvent.requestPermission !== 'function'
+          DeviceMotionEvent &&
+          typeof DeviceMotionEvent.requestPermission === 'function'
       ) {
-        document.body.click();
-      }
 
-    });
+        let permissionState = await DeviceMotionEvent.requestPermission()
+        if (permissionState === 'granted') {
+          // 許可を得られた場合、devicemotionをイベントリスナーに追加
+          window.addEventListener('devicemotion', this.onDeviceMotion.bind(this))
+        } else {
+          // 許可を得られなかった場合の処理
+          throw new Error("Cannot get devicemotion permission")
+        }
+
+        permissionState = await DeviceOrientationEvent.requestPermission();
+        if (permissionState === 'granted') {
+          // 許可を得られた場合、deviceorientationをイベントリスナーに追加
+          window.addEventListener('deviceorientation', this.onDeviceOrientation.bind(this))
+
+        } else {
+          throw new Error("Cannot get deviceorientation permission")
+
+        }
+
+      } else {
+        window.addEventListener('devicemotion', this.onDeviceMotion.bind(this));
+        window.addEventListener("deviceorientation", this.onDeviceOrientation.bind(this));
+
+      }
+    }catch(e){
+      console.error(e);
+    }
   }
 
-  onDeviceMotion(e){
+  _confirmPrompt(title, text) {
+    if(title && !text){
+      text = title;
+      title = undefined;
+    }
+
+    return new Promise((resolve, reject) => {
+
+      let html = "";
+      html += '<div class="modal fade" aria-hidden="true">';
+      html += '  <div class="modal-dialog modal-dialog-centered" role="document">\n';
+      html += '    <div class="modal-content">\n';
+      if(title){
+        html += '      <div class="modal-header">\n';
+        html += '        <h5 class="modal-title" id="exampleModalLongTitle">';
+        html += title;
+        html += '        </h5>\n';
+        html += '      </div>\n';
+      }
+      html += '      <div class="modal-body">\n';
+      html += text
+      html += '      </div>\n';
+      html += '      <div class="modal-footer">\n';
+      html += '        <button type="button" class="btn btn-primary">OK</button>\n';
+      html += '      </div>\n';
+      html += '    </div>\n';
+      html += '  </div>\n';
+      html += '</div>';
+
+      var div = document.createElement("div");
+      div.innerHTML = html;
+      div.querySelector("button").addEventListener('click', ()=>{
+        $(div.firstChild).modal("hide");
+        resolve();
+      })
+      document.body.appendChild(div);
+
+      $(div.firstChild).modal("show");
+    });
+
+
+  }
+
+  onDeviceMotion(e) {
     // console.log("onDeviceMotion")
 
     let now = new Date();
 
-    let accel =  e.acceleration;
+    let accel = e.acceleration;
     accel.time = now;
 
-    let gyro =  e.rotationRate;
+    let gyro = e.rotationRate;
     gyro.time = now;
 
     this.accel.x = accel.x;
@@ -528,7 +549,8 @@ class ObnizAIHelper {
     this.deviceMotionLogFilter();
 
   }
-  onDeviceOrientation(e){
+
+  onDeviceOrientation(e) {
 
     this.orientation = {
       absolute: e.absolute,
@@ -539,7 +561,7 @@ class ObnizAIHelper {
 
   }
 
-  deviceMotionLogFilter(){
+  deviceMotionLogFilter() {
     let now = new Date();
     let time = 1000;
 
@@ -553,48 +575,52 @@ class ObnizAIHelper {
 
   }
 
-  getAccelX(){
+  getAccelX() {
     return this.accel.x;
   }
-  getAccelY(){
+
+  getAccelY() {
     return this.accel.y;
   }
-  getAccelZ(){
+
+  getAccelZ() {
     return this.accel.z;
   }
 
-  getGyroAlpha(){
+  getGyroAlpha() {
     return this.gyro.alpha;
   }
-  getGyroBeta(){
+
+  getGyroBeta() {
     return this.gyro.beta;
   }
-  getGyroGannma(){
+
+  getGyroGannma() {
     return this.gyro.gamma;
   }
 
-  isShaked(){
-    let maxX = this.accel.logs.reduce((a,b)=>a.x>b.x?a:b,{}).x;
-    let maxY = this.accel.logs.reduce((a,b)=>a.y>b.y?a:b,{}).y;
-    let maxZ = this.accel.logs.reduce((a,b)=>a.z>b.z?a:b,{}).z;
-    let minX = this.accel.logs.reduce((a,b)=>a.x<b.x?a:b,{}).x;
-    let minY = this.accel.logs.reduce((a,b)=>a.y<b.y?a:b,{}).y;
-    let minZ = this.accel.logs.reduce((a,b)=>a.z<b.z?a:b,{}).z;
+  isShaked() {
+    let maxX = this.accel.logs.reduce((a, b) => a.x > b.x ? a : b, {}).x;
+    let maxY = this.accel.logs.reduce((a, b) => a.y > b.y ? a : b, {}).y;
+    let maxZ = this.accel.logs.reduce((a, b) => a.z > b.z ? a : b, {}).z;
+    let minX = this.accel.logs.reduce((a, b) => a.x < b.x ? a : b, {}).x;
+    let minY = this.accel.logs.reduce((a, b) => a.y < b.y ? a : b, {}).y;
+    let minZ = this.accel.logs.reduce((a, b) => a.z < b.z ? a : b, {}).z;
 
     // console.log({maxX, minX})
 
-    if(maxX - minX > 6 || maxY - minY > 6 || maxZ - minZ > 6 ){
+    if (maxX - minX > 6 || maxY - minY > 6 || maxZ - minZ > 6) {
       return true;
     }
 
     return false;
   }
 
-  isDeviceFaceDirection(dir){
-    if(dir === "sky"){
-      return Math.abs(this.orientation.beta) < 10 && Math.abs(this.orientation.gamma) < 10 ;
-    }else if(dir === "earth"){
-      return Math.abs(this.orientation.beta) > 170 && Math.abs(this.orientation.gamma) < 10 ;
+  isDeviceFaceDirection(dir) {
+    if (dir === "sky") {
+      return Math.abs(this.orientation.beta) < 10 && Math.abs(this.orientation.gamma) < 10;
+    } else if (dir === "earth") {
+      return Math.abs(this.orientation.beta) > 170 && Math.abs(this.orientation.gamma) < 10;
     }
     return false;
   }
