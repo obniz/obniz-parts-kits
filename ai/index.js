@@ -318,8 +318,16 @@ class ObnizAIHelper {
 
   /* speech */
 
-  say(mes, rate, pitch) {
-    return new Promise((resolve, reject) => {
+  async  say(mes, rate, pitch) {
+    let ready = new Promise((resolve, reject) => {
+      $(()=>{
+        resolve()
+      })
+    });
+    await ready; // for "Remove SpeechSynthesis.speak without user activation".  https://www.chromestatus.com/feature/5687444770914304
+
+    let p =  new Promise((resolve, reject) => {
+
       const synth = window.speechSynthesis;
       let message = new SpeechSynthesisUtterance(mes);
       if (typeof rate === "number") {
@@ -334,6 +342,8 @@ class ObnizAIHelper {
       synth.speak(message);
       resolve();
     })
+    let result = await p;
+    return result;
   }
 
   /* API related */
