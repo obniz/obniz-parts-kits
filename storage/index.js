@@ -1,5 +1,3 @@
-
-
 class ObnizStroage {
   constructor(name) {
     this.cloudStorageFileName = name || 'bockprogram_storage.json';
@@ -12,7 +10,7 @@ class ObnizStroage {
     this._storageCache = {};
     let form = new FormData();
     form.append('file', new Blob([JSON.stringify(this._storageCache)]), this.cloudStorageFileName);
-    await fetch('/users/me/repo/'+this.cloudStorageFileName,{
+    await fetch('/users/me/repo/' + this.cloudStorageFileName, {
       method: "POST",
       body: form,
       credentials: "include"
@@ -24,7 +22,7 @@ class ObnizStroage {
       return;
     }
     let response;
-    response = await fetch('/users/me/repo/'+this.cloudStorageFileName,{ method: "GET", credentials: "include" })
+    response = await fetch('/users/me/repo/' + this.cloudStorageFileName, {method: "GET", credentials: "include"})
     if (response.status === 200) {
       this._storageCache = await response.json();
     } else if (response.status === 404) {
@@ -32,7 +30,7 @@ class ObnizStroage {
     } else if (response.status === 403) {
       throw new Error('please login')
     } else {
-      throw new Error('cloud storage access error('+response.status+')')
+      throw new Error('cloud storage access error(' + response.status + ')')
     }
   }
 
@@ -42,7 +40,7 @@ class ObnizStroage {
     let form = new FormData();
     form.append('file', new Blob([JSON.stringify(this._storageCache)]), this.cloudStorageFileName);
 
-    await fetch('/users/me/repo/'+this.cloudStorageFileName,{
+    await fetch('/users/me/repo/' + this.cloudStorageFileName, {
       method: "POST",
       body: form,
       credentials: "include"

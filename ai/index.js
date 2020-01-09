@@ -318,8 +318,16 @@ class ObnizAIHelper {
 
   /* speech */
 
-  say(mes, rate, pitch) {
-    return new Promise((resolve, reject) => {
+  async say(mes, rate, pitch) {
+    let ready = new Promise((resolve, reject) => {
+      $(() => {
+        resolve()
+      })
+    });
+    await ready; // for "Remove SpeechSynthesis.speak without user activation".  https://www.chromestatus.com/feature/5687444770914304
+
+    let p = new Promise((resolve, reject) => {
+
       const synth = window.speechSynthesis;
       let message = new SpeechSynthesisUtterance(mes);
       if (typeof rate === "number") {
@@ -334,6 +342,8 @@ class ObnizAIHelper {
       synth.speak(message);
       resolve();
     })
+    let result = await p;
+    return result;
   }
 
   /* API related */
@@ -477,13 +487,13 @@ class ObnizAIHelper {
         window.addEventListener("deviceorientation", this.onDeviceOrientation.bind(this));
 
       }
-    }catch(e){
+    } catch (e) {
       console.error(e);
     }
   }
 
   _confirmPrompt(title, text) {
-    if(title && !text){
+    if (title && !text) {
       text = title;
       title = undefined;
     }
@@ -494,7 +504,7 @@ class ObnizAIHelper {
       html += '<div class="modal fade" aria-hidden="true">';
       html += '  <div class="modal-dialog modal-dialog-centered" role="document">\n';
       html += '    <div class="modal-content">\n';
-      if(title){
+      if (title) {
         html += '      <div class="modal-header">\n';
         html += '        <h5 class="modal-title" id="exampleModalLongTitle">';
         html += title;
@@ -513,7 +523,7 @@ class ObnizAIHelper {
 
       var div = document.createElement("div");
       div.innerHTML = html;
-      div.querySelector("button").addEventListener('click', ()=>{
+      div.querySelector("button").addEventListener('click', () => {
         $(div.firstChild).modal("hide");
         resolve();
       })
