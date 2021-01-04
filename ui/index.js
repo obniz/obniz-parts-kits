@@ -138,7 +138,7 @@ var ObnizUI = {};
 
       let targetObj = $('#obniz_slider_' + this.no);
       targetObj.on('input', () => {
-        this.change(this.slider.value);
+        this.change(parseInt(this.slider.value));
       });
 
       targetObj.change(() => {
