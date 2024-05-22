@@ -10,8 +10,9 @@
   <script src="./clmtrackr/emotion_classifier.js"> </script>
   <script src="./clmtrackr/emotionmodel.js"> </script>
   <script src="./clmtrackr/model_pca_20_svm.js"> </script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.5"> </script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.2.2"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.19.0"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
   <script src="index.js"></script>
 </head>
 <body>
@@ -21,6 +22,7 @@
 <button onclick="play()">play</button>
 <button onclick="playMusic()">playMusic</button>
 <script>
+
 
   async function playMusic(){
     await _ai.playMusic('./sample.mp3');
@@ -41,14 +43,16 @@
     const weather = await _ai.getWeather('Tokyo');
     console.log(weather);
 
-    // say
-    await _ai.say(weather);
-    await play();
-
-    await playMusic('xxx.mp3');
+    // // say
+    // await _ai.say(weather);
+    // await play();
+    //
+    // await playMusic('xxx.mp3');
     // Vision
     await _ai.startCamWait();
-    
+
+    const tmModel = new TMModel('https://teachablemachine.withgoogle.com/models/tI6Hv0sXt/');
+
     while(true) {
       // face detection
       if (_ai.isFaceInside()) {
@@ -57,14 +61,19 @@
         console.log('happy :' +_ai.isHappy() + " " + _ai.emotions.happy);
         console.log('surprise :' +_ai.isSurprised() + " " + _ai.emotions.surprised);
       }
-      
+
       // classify
-      console.log(await _ai.classify());
-      
+      console.log("classify", await _ai.classify());
+
       // white line detection
-      console.log(_ai.positionOfWhiteline());
-      
-      await new Promise((resolve)=>{setTimeout(resolve, 1)})
+      console.log("positionOfWhiteline", _ai.positionOfWhiteline());
+
+      const prediction = await tmModel.predict(_ai.video);
+      console.log(prediction);
+      console.log(await tmModel.predictProbability(_ai.video, "Class 1"));
+
+
+      await new Promise((resolve)=>{setTimeout(resolve, 1000)})
     }
   })();
 

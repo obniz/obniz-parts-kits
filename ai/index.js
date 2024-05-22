@@ -178,27 +178,27 @@ class ObnizAIHelper {
   }
 
   isAngry() {
-    return isEmotionDetected("angly");
+    return this.isEmotionDetected("angly");
   }
 
   isSad() {
-    return isEmotionDetected("sad");
+    return this.isEmotionDetected("sad");
   }
 
   isHappy() {
-    return isEmotionDetected("happy");
+    return this.isEmotionDetected("happy");
   }
 
   isDisgusted() {
-    return isEmotionDetected("disgusted");
+    return this.isEmotionDetected("disgusted");
   }
 
   isFear() {
-    return isEmotionDetected("fear");
+    return this.isEmotionDetected("fear");
   }
 
   isSurprised() {
-    return isEmotionDetected("surprised");
+    return this.isEmotionDetected("surprised");
   }
 
   getEmotionValue(emotionType) {
@@ -273,7 +273,7 @@ class ObnizAIHelper {
       let max_bright = 0;
       let max_bright_x = 0;
       const roi_h = parseInt(video.height * (0.7));
-      console.log("start");
+      // console.log("start");
       for (let col = 0; col < (video.width - window); col++) {
         let lastBoundary = 255;
         let pixel = 0;
@@ -320,9 +320,11 @@ class ObnizAIHelper {
 
   async say(mes, rate, pitch) {
     let ready = new Promise((resolve, reject) => {
-      $(() => {
-        resolve()
-      })
+      if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(resolve, 1);
+      } else {
+        document.addEventListener("DOMContentLoaded", resolve);
+      }
     });
     await ready; // for "Remove SpeechSynthesis.speak without user activation".  https://www.chromestatus.com/feature/5687444770914304
 
@@ -635,6 +637,97 @@ class ObnizAIHelper {
     return false;
   }
 
+}
+
+class TMModel {
+
+  /**
+   * @type {string}
+   */
+  url ;
+
+  /**
+   * @type {null|tmImage.ClassificationModel}
+   */
+  model = null;
+
+  /**
+   * @type {number | null}
+   */
+  maxPredictions= null;
+
+  /**
+   *
+   * @type {number}
+   */
+  lastPredictTime = 0;
+
+  /**
+   *
+   * @type {null|Object}
+   */
+  lastPredictResult = null;
+
+
+  /**
+   * @param {string} url
+   */
+  constructor(url) {
+    this.url = url;
+    this._init();
+  }
+
+  async _init() {
+    const modelURL = this.url + "model.json";
+    const metadataURL = this.url + "metadata.json";
+
+    // load the model and metadata
+    // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+    // or files from your local hard drive
+    // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+    this.model = await tmImage.load(modelURL, metadataURL);
+    this.maxPredictions = this.model.getTotalClasses();
+  }
+
+
+  async waitForInit() {
+    for (let i= 0; i < 100; i++) {
+      if(this.model !== null){return;}
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    //10秒立ってもだめならNG
+    throw new Error("Teachable Machine Model load failed");
+  }
+
+  async predict(image) {
+    await this.waitForInit();
+    if(new Date().getTime() < this.lastPredictTime + 100){
+      return this.lastPredictResult;
+    }
+    const prediction = await this.model.predict(image);
+    this.lastPredictTime = new Date().getTime();
+    this.lastPredictResult = prediction;
+    return prediction;
+  }
+
+  async predictClassName(image) {
+    const predict = await this.predict(image);
+    const result = predict.reduce((a, b) => a.probability > b.probability ? a : b);
+    return result.className;
+  }
+
+  async predictProbability(image, className) {
+    const predict = await this.predict(image);
+    if(predict.map(a => a.className).indexOf(className) === -1){
+      throw new Error(`Cannot find class name. ${className} is not in ${predict.map(a => a.className).join(", ")}`);
+    }
+    const result = predict.find((a) => a.className === className);
+    if(!result){
+      return null;
+    }
+
+    return result.probability;
+  }
 
 }
 
