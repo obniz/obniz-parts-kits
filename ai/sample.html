@@ -12,6 +12,7 @@
   <script src="./clmtrackr/model_pca_20_svm.js"> </script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.19.0"> </script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet@2.2.2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
   <script src="index.js"></script>
 </head>
@@ -67,6 +68,14 @@
 
       // white line detection
       console.log("positionOfWhiteline", _ai.positionOfWhiteline());
+
+      console.log(
+              await _ai.isBothHandsUpPose(),
+              await _ai.isOneHandsUpPose(),
+              await _ai.isNormalPose(),
+              await _ai.isLeftHandsUpPose(),
+              await _ai.isRightHandsUpPose()
+      );
 
       const prediction = await tmModel.predict(_ai.video);
       console.log(prediction);
